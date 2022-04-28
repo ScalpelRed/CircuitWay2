@@ -1,6 +1,13 @@
 package com.example.circuitway;
 
+import android.telecom.Call;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TableRow;
+
+import androidx.appcompat.content.res.AppCompatResources;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.Objects;
 
@@ -18,24 +25,41 @@ public class Detail {
 
     public Button Graphic;
 
-    public Detail(Pin ... pins){
+    CircuitActivity circuitActivity;
+
+    public Detail(CircuitActivity c, Pin[] pins){
+        circuitActivity = c;
+
         ID = lastID;
         lastID++;
         Pins = pins;
+        for (int i = 0; i < pins.length; i++){
+            pins[i].Details.add(this);
+        }
 
+        Graphic = new Button(c);
+        Graphic.setBackground(AppCompatResources.getDrawable(c,
+                R.drawable.d_unknown));
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                128, 64);
+        Graphic.setPadding(128, 0, 0, 0);
+        Graphic.setLayoutParams(params);
 
-        if (Pins[1].x < Pins[0].x){
-
+        /*if (Pins[1].x < Pins[0].x){
+            Graphic.setPadding(64 * Pins[1].x, 0, 0, 0);
         }
         else if (Pins[0].y < Pins[1].y){
 
         }
         else if (Pins[0].x < Pins[1].x){
-
+            Graphic.setPadding(64 * Pins[0].x, 0, 0, 0);
         }
         else if (Pins[1].y < Pins[0].y){
 
-        }
+        }*/
+
+        c.DetailField.addView(Graphic);
+        System.out.println(Pins[0].x + " " + Pins[1].x);
     }
 
     public void getBranch(){
@@ -43,26 +67,38 @@ public class Detail {
     }
 
     public float getTotalResistance(){
-        return 0;
+        return Float.NaN;
+    }
+
+    public void balancePotentials(){
+
+    }
+
+    public float getCurrent(){
+        return Float.NaN;
     }
 
     public void step(){
 
     }
 
-    public float getCurrent(){
-        return 0;
+    public final void detach(){
+        for (int i = 0; i < Pins.length; i++){
+            Pins[i].Details.remove(this);
+        }
+        circuitActivity.Details.remove(this);
+        // TODO удаление Graphic
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Detail detail = (Detail) o;
         return ID == detail.ID;
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(ID);
     }
 }

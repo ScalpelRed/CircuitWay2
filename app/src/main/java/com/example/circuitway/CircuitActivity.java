@@ -1,6 +1,7 @@
 package com.example.circuitway;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.os.Bundle;
 import android.view.View;
@@ -14,9 +15,11 @@ import java.util.ArrayList;
 public class CircuitActivity extends AppCompatActivity {
 
     public ArrayList<Branch> Branches = new ArrayList<>();
+    public ArrayList<Detail> Details = new ArrayList<>();
     public ArrayList<Pin> Pins = new ArrayList<>();
 
     public TableLayout PinField;
+    public ConstraintLayout DetailField;
     public RelativeLayout CircuitField;
 
     @Override
@@ -28,6 +31,7 @@ public class CircuitActivity extends AppCompatActivity {
         int level = intent.getInt("level");
 
         PinField = findViewById(R.id.PinField);
+        DetailField = findViewById(R.id.DetailField);
         CircuitField = findViewById(R.id.CircuitField);
 
         for (int i = 0; i < 5; i++){
