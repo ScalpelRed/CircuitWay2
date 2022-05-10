@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".CircuitActivity">
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:context=".CircuitActivity"
+
+    >
     
     
     <RelativeLayout
@@ -13,19 +16,54 @@
         >
 
         <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/PinField">
         </TableLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/DetailField">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+
+
     </RelativeLayout>
 
-</RelativeLayout>
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Step"
+        android:id="@+id/StepButton"
+        android:layout_toEndOf="@id/CircuitField"
+        app:layout_constraintTop_toBottomOf="@id/CircuitField"
+        >
+
+    </Button>
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Start"
+        android:id="@+id/StartButton"
+        android:layout_toEndOf="@id/CircuitField"
+        app:layout_constraintTop_toBottomOf="@id/StepButton"
+        >
+
+    </Button>
+
+    <Button
+        android:layout_width="200dp"
+        android:layout_height="50dp"
+        android:text="Toggle loop mode"
+        android:id="@+id/LoopButton"
+        android:layout_toEndOf="@id/CircuitField"
+        app:layout_constraintTop_toBottomOf="@id/StartButton"
+        >
+
+    </Button>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

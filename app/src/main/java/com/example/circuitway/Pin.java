@@ -1,32 +1,31 @@
 package com.example.circuitway;
 
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.telecom.Call;
+import android.graphics.ColorSpace;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.RelativeLayout;
-import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import androidx.appcompat.content.res.AppCompatResources;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Pin {
+
+    private static int lastID = 0;
+    public int ID;
 
     public float Potential = 0;
     public float balancePotential = 0;
 
     public ArrayList<Detail> Details = new ArrayList<>();
-    public byte detailCount;
 
-    Button PinButton;
-    static ArrayList<Pin> selectedPins = new ArrayList<Pin>();
+    Button Graphic;
+    static ArrayList<Pin> selectedPins = new ArrayList<>();
     static int maxToSelect = 2;
     boolean isSelected = false;
+
     public int x;
     public int y;
 
@@ -35,18 +34,19 @@ public class Pin {
     public Pin(CircuitActivity context, int x, int y){
 
         CircuitActivity = context;
+        ID = lastID++;
 
-        PinButton = new Button(context);
-        PinButton.setBackground(AppCompatResources.getDrawable(context,
+        Graphic = new Button(context);
+        Graphic.setBackground(AppCompatResources.getDrawable(context,
                 R.drawable.circuit_dot));
         TableRow.LayoutParams params = new TableRow.LayoutParams(
                 64, 64);
-        PinButton.setLayoutParams(params);
+        Graphic.setLayoutParams(params);
 
         this.x = x;
         this.y = y;
 
-        PinButton.setOnClickListener(new View.OnClickListener() {
+        Graphic.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isSelected){
@@ -54,10 +54,9 @@ public class Pin {
                             Pin.this)) {
                         select();
                         if (selectedPins.size() == maxToSelect) {
-                            Detail d = new Detail(CircuitActivity,
+                            Detail d = new Battery(CircuitActivity,
                                     selectedPins.toArray(new Pin[0]));
                             CircuitActivity.Details.add(d);
-                            Details.add(d);
                             System.out.println(d);
 
                             while (selectedPins.size() > 0) {
@@ -80,13 +79,13 @@ public class Pin {
 
     void select(){
         selectedPins.add(this);
-        PinButton.setAlpha(0.5f);
+        Graphic.setAlpha(0.5f);
         isSelected = true;
     }
 
     void deselect(){
         selectedPins.remove(this);
-        PinButton.setAlpha(1f);
+        Graphic.setAlpha(1f);
         isSelected = false;
     }
 
@@ -105,7 +104,22 @@ public class Pin {
 
     public void postPotentialBalance() {
         Potential = balancePotential / Details.size();
+        if (!Float.isNaN(Potential)) { System.out.println(Potential); }
         balancePotential = 0;
+        Graphic.setAlpha(Math.abs(Potential / 128f));
+        System.out.println("[POTENTIAL] " + ID + " " + Potential);
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Pin pin = (Pin) o;
+        return ID == pin.ID;
+    }
+
+    @Override
+    public final int hashCode() {
+        return Objects.hash(ID);
     }
 
 }

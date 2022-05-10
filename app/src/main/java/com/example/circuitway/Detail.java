@@ -20,8 +20,8 @@ public class Detail {
     public Pin[] Pins;
     public final int NominalContactCount = 0;
 
-    public boolean IsInBranch = false;
     public Branch Branch;
+    public Detail LastBranchCheckSource;
 
     public Button Graphic;
 
@@ -30,8 +30,7 @@ public class Detail {
     public Detail(CircuitActivity c, Pin[] pins){
         circuitActivity = c;
 
-        ID = lastID;
-        lastID++;
+        ID = lastID++;
         Pins = pins;
         for (int i = 0; i < pins.length; i++){
             pins[i].Details.add(this);
@@ -40,9 +39,10 @@ public class Detail {
         Graphic = new Button(c);
         Graphic.setBackground(AppCompatResources.getDrawable(c,
                 R.drawable.d_unknown));
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 128, 64);
-        Graphic.setPadding(128, 0, 0, 0);
+        params.leftMargin = 64 * Pins[1].x;
+        System.out.println(params.leftMargin);
         Graphic.setLayoutParams(params);
 
         /*if (Pins[1].x < Pins[0].x){
@@ -59,11 +59,27 @@ public class Detail {
         }*/
 
         c.DetailField.addView(Graphic);
-        System.out.println(Pins[0].x + " " + Pins[1].x);
+
     }
 
-    public void getBranch(){
+    public Branch getBranch(Detail d) {
+        if (Branch == null){
+            for (Pin v : Pins){
+                if (v.Details.size() == 2){
+                    for (Detail b : v.Details){
+                        if (b != this && b.LastBranchCheckSource != d){
+                            b.LastBranchCheckSource = d;
+                            Branch = b.getBranch(d);
+                            return Branch;
+                        }
+                    }
+                }
+            }
+        }
+        else return Branch;
 
+        Branch = new Branch(circuitActivity);
+        return Branch;
     }
 
     public float getTotalResistance(){
@@ -87,7 +103,7 @@ public class Detail {
             Pins[i].Details.remove(this);
         }
         circuitActivity.Details.remove(this);
-        // TODO удаление Graphic
+        circuitActivity.DetailField.removeView(Graphic);
     }
 
     @Override
