@@ -57,7 +57,6 @@ public class Pin {
                             Detail d = new Battery(CircuitActivity,
                                     selectedPins.toArray(new Pin[0]));
                             CircuitActivity.Details.add(d);
-                            System.out.println(d);
 
                             while (selectedPins.size() > 0) {
                                 selectedPins.get(0).deselect();
@@ -81,6 +80,7 @@ public class Pin {
         selectedPins.add(this);
         Graphic.setAlpha(0.5f);
         isSelected = true;
+        System.out.println("Selected pin " + ID);
     }
 
     void deselect(){
@@ -96,7 +96,7 @@ public class Pin {
                 Pin sp = selectedPins.get(0);
                 boolean res = (sp.x == p.x && Math.abs(sp.y - p.y) == 2)
                         || (sp.y == p.y && Math.abs(sp.x - p.x) == 2);
-                System.out.println("Pattern is correct: " + res);
+                System.out.println("The pattern is correct: " + res);
                 return res;
             default: return false;
         }
@@ -104,10 +104,9 @@ public class Pin {
 
     public void postPotentialBalance() {
         Potential = balancePotential / Details.size();
-        if (!Float.isNaN(Potential)) { System.out.println(Potential); }
         balancePotential = 0;
         Graphic.setAlpha(Math.abs(Potential / 128f));
-        System.out.println("[POTENTIAL] " + ID + " " + Potential);
+        if (!Float.isNaN(Potential)) System.out.println("Potential on " + ID + " is " + Potential);
     }
 
     @Override

@@ -29,7 +29,6 @@ public class CircuitActivity extends AppCompatActivity {
 
     public int TPS;
     public boolean Loop;
-    public Thread LoopThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,27 +73,19 @@ public class CircuitActivity extends AppCompatActivity {
                 step();
             }
         });
-        LoopButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleLoop();
-            }
-        });
-
-        LoopThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (Loop){
-
-                }
-            }
-        });
     }
 
     public void start(){
         for (Detail d : Details){
             d.getBranch(d);
-            System.out.println("[BRANCH] " + d.ID + " " + d.Branch.ID);
+            System.out.println("The branch of " + d.ID + " is " + d.Branch.ID);
+        }
+        for (Branch b : Branches){
+            b.FindEdges();
+            if (b.Pin1 != null) System.out.println("c1 " + b.Pin1.ID);
+            else System.out.println("c1 e");
+            if (b.Pin2 != null) System.out.println("c2 " + b.Pin2.ID);
+            else System.out.println("c2 e");
         }
     }
 
@@ -105,12 +96,13 @@ public class CircuitActivity extends AppCompatActivity {
         for (Pin p : Pins){
             p.postPotentialBalance();
         }
+        for (Branch b : Branches){
+            b.CalculateResistance();
+        }
         for (Detail d : Details){
             d.step();
         }
+
     }
 
-    public void toggleLoop(){
-        Loop = !Loop;
-    }
 }

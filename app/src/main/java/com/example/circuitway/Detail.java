@@ -8,7 +8,9 @@ import android.widget.TableRow;
 
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Detail {
@@ -39,26 +41,31 @@ public class Detail {
         Graphic = new Button(c);
         Graphic.setBackground(AppCompatResources.getDrawable(c,
                 R.drawable.d_unknown));
-        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
-                128, 64);
-        params.leftMargin = 64 * Pins[1].x;
-        System.out.println(params.leftMargin);
-        Graphic.setLayoutParams(params);
 
-        /*if (Pins[1].x < Pins[0].x){
-            Graphic.setPadding(64 * Pins[1].x, 0, 0, 0);
+        ConstraintLayout.LayoutParams params = null;
+
+        if (Pins[0].x < Pins[1].x){
+            params = new ConstraintLayout.LayoutParams(128, 64);
+            Graphic.setRotation(0);
         }
         else if (Pins[0].y < Pins[1].y){
-
+            params = new ConstraintLayout.LayoutParams(64, 128);
+            Graphic.setRotation(90);
         }
-        else if (Pins[0].x < Pins[1].x){
-            Graphic.setPadding(64 * Pins[0].x, 0, 0, 0);
+        else if (Pins[1].x < Pins[0].x){
+            params = new ConstraintLayout.LayoutParams(128, 64);
+            Graphic.setRotation(180);
         }
         else if (Pins[1].y < Pins[0].y){
+            params = new ConstraintLayout.LayoutParams(64, 128);
+            Graphic.setRotation(270);
+        }
 
-        }*/
+        params.setMargins(64 * Pins[0].x, 0, 0, 0);
+        Graphic.setLayoutParams(params);
 
         c.DetailField.addView(Graphic);
+
 
     }
 
@@ -70,6 +77,7 @@ public class Detail {
                         if (b != this && b.LastBranchCheckSource != d){
                             b.LastBranchCheckSource = d;
                             Branch = b.getBranch(d);
+                            Branch.Details.add(this);
                             return Branch;
                         }
                     }
