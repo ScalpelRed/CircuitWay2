@@ -1,95 +1,165 @@
 package com.example.circuitway;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
-import android.widget.ToggleButton;
+import android.widget.TextView;
 
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 
 public class CircuitActivity extends AppCompatActivity {
+
+    Resources resources;
 
     public ArrayList<Branch> Branches = new ArrayList<>();
     public ArrayList<Detail> Details = new ArrayList<>();
     public ArrayList<Pin> Pins = new ArrayList<>();
+    public ArrayList<Task> Tasks = new ArrayList<>();
+    
+    public Detail SelectedDetail = null;
 
     public TableLayout PinField;
     public ConstraintLayout DetailField;
     public RelativeLayout CircuitField;
-    public Button StepButton;
     public Button StartButton;
-    public Button LoopButton;
 
-    public int TPS;
-    public boolean Loop;
+    public ConstraintLayout EditorView;
+    public ConstraintLayout RunningView;
+
+    public Button SelectWireButton;
+    public Button SelectBatteryButton;
+    public Button SelectSwitchButton;
+    public ImageView DetailSelection;
+
+    public TextView InfoText;
+    public Button RemoveDetailButton;
+    public Button SpecialActionButton;
+
+    public ConstraintLayout CircuitView;
+    public ConstraintLayout TaskView;
+    public Button CloseTasksButton;
+    public Button OpenTasksButton;
+
+    public int timeStep = 100;
+    public int taskStep = 1000;
+    public long lastStepMills = System.currentTimeMillis();
+    public long lastTaskMills = System.currentTimeMillis();
+    public boolean isRunning;
+
+    
+    public Thread SimulationThread;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_circuit);
 
-        Bundle intent = getIntent().getExtras();
-        int level = intent.getInt("level");
+        resources = getResources();
 
         PinField = findViewById(R.id.PinField);
         DetailField = findViewById(R.id.DetailField);
         CircuitField = findViewById(R.id.CircuitField);
-        StepButton = findViewById(R.id.StepButton);
         StartButton = findViewById(R.id.StartButton);
-        LoopButton = findViewById(R.id.LoopButton);
 
-        for (int i = 0; i < 5; i++){
-            TableRow row = new TableRow(this);
-            PinField.addView(row);
-            ViewGroup.LayoutParams lp = new TableLayout.LayoutParams(
-                    TableLayout.LayoutParams.WRAP_CONTENT,
-                    TableLayout.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
+        EditorView = findViewById(R.id.editorView);
+        RunningView = findViewById(R.id.runningInfoView);
 
-            for (int p = 0; p < 5; p++){
-                Pin pin = new Pin(this, p, i);
-                Pins.add(pin);
-                row.addView(pin.Graphic);
-            }
-        }
+        SelectWireButton = findViewById(R.id.DSB_wire);
+        SelectBatteryButton = findViewById(R.id.DSB_battery);
+        SelectSwitchButton = findViewById(R.id.DSB_switch);
+        DetailSelection = findViewById(R.id.detailSelection);
 
-        StartButton.setOnClickListener(new View.OnClickListener() {
+        InfoText = findViewById(R.id.InfoText);
+        RemoveDetailButton = findViewById(R.id.RemoveButton);
+        SpecialActionButton = findViewById(R.id.ActionButton);
+
+        CircuitView = findViewById(R.id.circuitView);
+        TaskView = findViewById(R.id.taskView);
+        OpenTasksButton = findViewById(R.id.openTasks);
+        CloseTasksButton = findViewById(R.id.closeTasks);
+
+        SimulationThread = new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                start();
+            public void run() {
+                while (true) {
+                    if (System.currentTimeMillis() - lastStepMills > timeStep) {
+                        simulationStep();
+                        lastStepMills = System.currentTimeMillis();
+                    }
+                    if (System.currentTimeMillis() - lastTaskMills > taskStep){
+                        checkLevelCompleteness();
+                        lastStepMills = System.currentTimeMillis();
+                    }
+
+                }
             }
         });
 
-        StepButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                step();
-            }
-        });
+        StartButton.setOnClickListener(v -> runSimulation());
+
+        SelectWireButton.setOnClickListener(v
+                -> SetSelectedDetailType(Detail.DetailType.WIRE));
+        SelectBatteryButton.setOnClickListener(v
+                -> SetSelectedDetailType(Detail.DetailType.BATTERY));
+        SelectSwitchButton.setOnClickListener(v
+                -> SetSelectedDetailType(Detail.DetailType.SWITCH));
+
+        RemoveDetailButton.setOnClickListener(v
+                -> {
+                        SelectedDetail.detach();
+                        SetSelectedDetail(null);
+                    });
+        SpecialActionButton.setOnClickListener(v
+                -> SelectedDetail.specialAction());
+
+        TaskView.setVisibility(GONE);
+        OpenTasksButton.setOnClickListener(v
+            -> { CircuitView.setVisibility(GONE);
+            TaskView.setVisibility(VISIBLE); });
+        CloseTasksButton.setOnClickListener(v
+                -> { CircuitView.setVisibility(VISIBLE);
+            TaskView.setVisibility(GONE); });
+
+        RunningView.setVisibility(GONE);
+
+
+        Bundle intent = getIntent().getExtras();
+        int level = intent.getInt("level");
+        LevelLoader.Open(level, this);
     }
 
-    public void start(){
+    public void runSimulation(){
         for (Detail d : Details){
             d.getBranch(d);
-            System.out.println("The branch of " + d.ID + " is " + d.Branch.ID);
+            //System.out.println("The branch of " + d.ID + " is " + d.Branch.ID);
         }
         for (Branch b : Branches){
             b.FindEdges();
-            if (b.Pin1 != null) System.out.println("c1 " + b.Pin1.ID);
-            else System.out.println("c1 e");
-            if (b.Pin2 != null) System.out.println("c2 " + b.Pin2.ID);
-            else System.out.println("c2 e");
         }
+
+        EditorView.setVisibility(GONE);
+        RunningView.setVisibility(VISIBLE);
+
+        //SimulationThread.start();
     }
 
-    public void step(){
+    private void simulationStep(){
         for (Detail d : Details){
             d.balancePotentials();
         }
@@ -102,7 +172,57 @@ public class CircuitActivity extends AppCompatActivity {
         for (Detail d : Details){
             d.step();
         }
+        if (SelectedDetail != null){
 
+        }
+    }
+
+    public boolean checkLevelCompleteness(){
+        for (Task t : Tasks) if (!t.checkCompleteness()) return false;
+
+        return true;
+    }
+
+    public void SetInfoText(String text){
+        InfoText.setText(text);
+    }
+
+
+
+    public void SetSelectedDetailType(Detail.DetailType t) {
+        Button t2 = null;
+        switch (t){
+            case WIRE:
+                t2 = SelectWireButton;
+                Detail.SelectedDetailType = Detail.DetailType.WIRE;
+                break;
+            case BATTERY:
+                t2 = SelectBatteryButton;
+                Detail.SelectedDetailType = Detail.DetailType.BATTERY;
+                break;
+            case SWITCH:
+                t2 = SelectSwitchButton;
+                Detail.SelectedDetailType = Detail.DetailType.SWITCH;
+                break;
+        }
+        /*ConstraintLayout.LayoutParams p
+                = (ConstraintLayout.LayoutParams)DetailSelection.getLayoutParams();
+        p.leftToLeft = t2.getId();*/
+
+    }
+
+    public void SetSelectedDetail(Detail d){
+        SelectedDetail = d;
+        for (Detail d2 : Details)
+            d2.SelectionGraphic.setVisibility(GONE);
+        if (d == null) SetInfoText("Select a detail to view information about it.");
+        else if (!isRunning) SetInfoText(d.getEditorInfo());
+        //else SetInfoText(d.getRunningInfo());
+    }
+
+    public Detail GetDetailByID(int id){
+        for (Detail d : Details) if (d.ID == id) return d;
+        return null;
     }
 
 }

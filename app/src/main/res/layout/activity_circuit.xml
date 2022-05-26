@@ -1,69 +1,204 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".CircuitActivity"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    tools:context=".CircuitActivity">
 
-    >
-    
-    
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/CircuitField"
-        >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/circuitView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <TableLayout
+        <Button
+            android:id="@+id/openTasks"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@drawable/tasksbutton"
+            >
+
+        </Button>
+
+        <TextView
+            android:id="@+id/InfoText"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:fontFamily="@font/pgr"
+            android:text="Type: "
+            android:textAlignment="textStart"
+            android:textColor="@color/mainTheme"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toRightOf="parent" />
+
+        <RelativeLayout
+            android:id="@+id/CircuitField"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/PinField">
-        </TableLayout>
+
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TableLayout
+                android:id="@+id/PinField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/DetailField"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        </RelativeLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/DetailField">
+            app:layout_constraintTop_toBottomOf="@id/CircuitField"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:id="@+id/runningInfoView">
+
+
+                <Button
+                    android:id="@+id/RemoveButton"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/removebutton"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    />
+
+                <Button
+                    android:id="@+id/ActionButton"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/specialactionbutton"
+                    app:layout_constraintLeft_toRightOf="@id/RemoveButton"
+                    />
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
+        <Button
+
+            android:id="@+id/StartButton"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/startbutton"
+            android:backgroundTint="@color/mainTheme"
+            app:layout_constraintLeft_toRightOf="@id/CircuitField"
+            app:layout_constraintTop_toTopOf="@id/CircuitField">
+
+        </Button>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/CircuitField"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:id="@+id/editorView"
+            >
+
+            <Button
+                android:id="@+id/DSB_wire"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/d_wire"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_margin="5dp"
+                />
+
+            <Button
+                android:id="@+id/DSB_battery"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/d_battery"
+                app:layout_constraintLeft_toLeftOf="@+id/DSB_wire"
+                app:layout_constraintTop_toBottomOf="@+id/DSB_wire"
+                android:layout_margin="5dp"
+                />
+
+            <Button
+                android:id="@+id/DSB_switch"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/d_switch_off"
+                app:layout_constraintLeft_toRightOf="@+id/DSB_wire"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_margin="5dp"
+                />
+
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:background="@drawable/selectionbox"
+                android:id="@+id/detailSelection"
+                app:layout_constraintLeft_toLeftOf="@+id/DSB_wire"
+                app:layout_constraintTop_toBottomOf="@+id/DSB_wire"
+                android:layout_margin="5dp"
+                />
 
 
-    </RelativeLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Step"
-        android:id="@+id/StepButton"
-        android:layout_toEndOf="@id/CircuitField"
-        app:layout_constraintTop_toBottomOf="@id/CircuitField"
-        >
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </Button>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/taskView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Start"
-        android:id="@+id/StartButton"
-        android:layout_toEndOf="@id/CircuitField"
-        app:layout_constraintTop_toBottomOf="@id/StepButton"
-        >
 
-    </Button>
+        <Button
+            android:id="@+id/closeTasks"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@drawable/deselectbutton"
+            >
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="50dp"
-        android:text="Toggle loop mode"
-        android:id="@+id/LoopButton"
-        android:layout_toEndOf="@id/CircuitField"
-        app:layout_constraintTop_toBottomOf="@id/StartButton"
-        >
+        </Button>
 
-    </Button>
+        <TextView
+            android:id="@+id/taskHeader"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:fontFamily="@font/pgr"
+            android:text="Tasks"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/mainTheme"
+            android:textSize="34sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/closeTasks"
+            app:layout_constraintTop_toTopOf="parent"
+
+            />
+
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+
+        </ListView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,7 +1,14 @@
 package com.example.circuitway;
 
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
+
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.telecom.Call;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TableRow;
@@ -15,8 +22,9 @@ import java.util.Objects;
 
 public class Detail {
 
-    private static int lastID = 0;
+    public static int lastID = 0;
     public int ID;
+    public boolean isEditable = true;
 
     public float Resistance;
     public Pin[] Pins;
@@ -25,12 +33,18 @@ public class Detail {
     public Branch Branch;
     public Detail LastBranchCheckSource;
 
-    public Button Graphic;
+    public Button GraphicButton;
+    public ImageView Graphic;
+    public ImageView SelectionGraphic;
+
+    public static DetailType SelectedDetailType = DetailType.WIRE;
 
     CircuitActivity circuitActivity;
+    Resources resources;
 
     public Detail(CircuitActivity c, Pin[] pins){
         circuitActivity = c;
+        resources = c.getResources();
 
         ID = lastID++;
         Pins = pins;
@@ -38,36 +52,84 @@ public class Detail {
             pins[i].Details.add(this);
         }
 
-        Graphic = new Button(c);
+        GraphicButton = new Button(c);
+        GraphicButton.setBackground(AppCompatResources.getDrawable(c,
+                R.drawable.d_transparent));
+
+        Graphic = new ImageView(c);
         Graphic.setBackground(AppCompatResources.getDrawable(c,
                 R.drawable.d_unknown));
+        Graphic.getBackground().setTint(
+                circuitActivity.getResources().getColor(R.color.mainTheme));
 
-        ConstraintLayout.LayoutParams params = null;
+        SelectionGraphic = new ImageView(c);
+        SelectionGraphic.setBackground(AppCompatResources.getDrawable(c,
+                R.drawable.selectionbox));
+        SelectionGraphic.getBackground().setTint(
+                circuitActivity.getResources().getColor(R.color.mainTheme));
+        SelectionGraphic.setVisibility(GONE);
+
+        ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
+                64, 64);
+        ConstraintLayout.LayoutParams params2 = new ConstraintLayout.LayoutParams(
+                128, 64);
+        ConstraintLayout.LayoutParams params3 = new ConstraintLayout.LayoutParams(
+                128, 64);
+
+        params.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params2.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params2.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
+        params3.topToTop = ConstraintLayout.LayoutParams.PARENT_ID;
+        params3.leftToLeft = ConstraintLayout.LayoutParams.PARENT_ID;
 
         if (Pins[0].x < Pins[1].x){
-            params = new ConstraintLayout.LayoutParams(128, 64);
-            Graphic.setRotation(0);
+            params.setMargins(64 * Pins[0].x + 64, 64 * Pins[0].y, 0, 0);
+            params2.setMargins(64 * Pins[0].x + 32, 64 * Pins[0].y, 0, 0);
+            params3.setMargins(64 * Pins[0].x + 32, 64 * Pins[0].y, 0, 0);
+        }
+        else if (Pins[0].x > Pins[1].x){
+            params.setMargins(64 * Pins[1].x + 64, 64 * Pins[0].y, 0, 0);
+            params2.setMargins(64 * Pins[1].x + 32, 64 * Pins[0].y, 0, 0);
+            params3.setMargins(64 * Pins[1].x + 32, 64 * Pins[0].y, 0, 0);
         }
         else if (Pins[0].y < Pins[1].y){
-            params = new ConstraintLayout.LayoutParams(64, 128);
+            params.setMargins(64 * Pins[0].x, 64 * Pins[0].y + 64, 0, 0);
+            params2.setMargins(64 * Pins[0].x - 32, 64 * Pins[0].y + 64, 0, 0);
+            params3.setMargins(64 * Pins[0].x - 32, 64 * Pins[0].y + 64, 0, 0);
             Graphic.setRotation(90);
+            SelectionGraphic.setRotation(90);
         }
-        else if (Pins[1].x < Pins[0].x){
-            params = new ConstraintLayout.LayoutParams(128, 64);
-            Graphic.setRotation(180);
-        }
-        else if (Pins[1].y < Pins[0].y){
-            params = new ConstraintLayout.LayoutParams(64, 128);
-            Graphic.setRotation(270);
+        else if (Pins[0].y > Pins[1].y){
+            params.setMargins(64 * Pins[0].x, 64 * Pins[1].y + 64, 0, 0);
+            params2.setMargins(64 * Pins[0].x - 32, 64 * Pins[1].y + 64, 0, 0);
+            params3.setMargins(64 * Pins[0].x - 32, 64 * Pins[1].y + 64, 0, 0);
+            Graphic.setRotation(90);
+            SelectionGraphic.setRotation(90);
         }
 
-        params.setMargins(64 * Pins[0].x, 0, 0, 0);
-        Graphic.setLayoutParams(params);
-
+        GraphicButton.setLayoutParams(params);
+        Graphic.setLayoutParams(params2);
+        SelectionGraphic.setLayoutParams(params3);
+        c.DetailField.addView(GraphicButton);
         c.DetailField.addView(Graphic);
+        c.DetailField.addView(SelectionGraphic);
 
+        GraphicButton.setOnClickListener(v ->
+        {
+            if (circuitActivity.SelectedDetail != this) {
+                circuitActivity.SetSelectedDetail(this);
+                SelectionGraphic.setVisibility(VISIBLE);
+            }
+            else {
+                circuitActivity.SetSelectedDetail(null);
+            }
+
+        });
 
     }
+
+
 
     public Branch getBranch(Detail d) {
         if (Branch == null){
@@ -90,7 +152,8 @@ public class Detail {
         return Branch;
     }
 
-    public float getTotalResistance(){
+    public float getResistance() { return Resistance; }
+    public float getBranchResistance(){
         return Float.NaN;
     }
 
@@ -102,8 +165,16 @@ public class Detail {
         return Float.NaN;
     }
 
+    public float getVoltage(){ return Math.abs(Pins[0].Potential - Pins[1].Potential); }
+
     public void step(){
 
+    }
+
+    public String getEditorInfo(){
+        String res = "The detail is broken.";
+        if (!isEditable) res += "\nLocked";
+        return res;
     }
 
     public final void detach(){
@@ -111,7 +182,13 @@ public class Detail {
             Pins[i].Details.remove(this);
         }
         circuitActivity.Details.remove(this);
+        circuitActivity.DetailField.removeView(GraphicButton);
         circuitActivity.DetailField.removeView(Graphic);
+        circuitActivity.DetailField.removeView(SelectionGraphic);
+    }
+
+    public void specialAction(){
+
     }
 
     @Override
@@ -124,5 +201,29 @@ public class Detail {
     @Override
     public final int hashCode() {
         return Objects.hash(ID);
+    }
+
+
+
+    public enum DetailType {
+        INVALID,
+        WIRE,
+        BATTERY,
+        SWITCH,
+        RESISTOR,
+        DISISTOR,
+        CAPACITOR
+    }
+
+    public static Detail CreateDetail(DetailType t, CircuitActivity c, Pin ... pins) {
+        switch (t){
+            case INVALID: return new Detail(c, pins);
+            case WIRE: return new Wire(c, pins);
+            case BATTERY: return new Battery(c, pins);
+            case SWITCH: return new Switch(c, pins);
+            case RESISTOR: return new Resistor(c, pins);
+            case DISISTOR: return new Disistor(c, pins);
+            default: return null;
+        }
     }
 }

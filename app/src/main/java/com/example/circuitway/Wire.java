@@ -11,6 +11,8 @@ public class Wire extends Detail {
 
         Graphic.setBackground(AppCompatResources.getDrawable(c,
                 R.drawable.d_wire));
+        Graphic.getBackground().setTint(
+                circuitActivity.getResources().getColor(R.color.mainTheme));
     }
 
     @Override
@@ -22,12 +24,25 @@ public class Wire extends Detail {
     @Override
     public float getCurrent() {
         super.getCurrent();
-        return (Pins[0].Potential - Pins[1].Potential) / getTotalResistance();
+        return (Pins[0].Potential - Pins[1].Potential) / getBranchResistance();
+    }
+
+    @Override
+    public float getResistance(){
+        return 0;
     }
 
     @Override
     public void balancePotentials(){
         Pins[0].balancePotential += Pins[1].Potential;
         Pins[1].balancePotential += Pins[0].Potential;
+    }
+
+    @Override
+    public String getEditorInfo() {
+        String res = "Wire";
+        if (!isEditable) res += "\nLocked";
+        return res;
+
     }
 }

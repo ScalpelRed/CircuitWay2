@@ -1,10 +1,5 @@
 package com.example.circuitway;
 
-import android.widget.EdgeEffect;
-import android.widget.TableRow;
-
-import androidx.appcompat.content.res.AppCompatResources;
-
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -14,8 +9,8 @@ public class Branch {
     public int ID;
 
     public ArrayList<Detail> Details = new ArrayList<>();
-    public Pin Pin1;
-    public Pin Pin2;
+    public Pin EdgePin1;
+    public Pin EdgePin2;
 
     public CircuitActivity circuitActivity;
 
@@ -35,14 +30,22 @@ public class Branch {
     public void FindEdges() {
         for (Detail v : Details){
             if (v.Pins[0].Details.size() != 2) {
-                if (Pin1 == null) Pin1 = v.Pins[0];
-                else Pin2 = v.Pins[0];
+                if (EdgePin1 == null) EdgePin1 = v.Pins[0];
+                else EdgePin2 = v.Pins[0];
             }
             if (v.Pins[1].Details.size() != 2) {
-                if (Pin1 == null) Pin1 = v.Pins[1];
-                else Pin2 = v.Pins[1];
+                if (EdgePin1 == null) EdgePin1 = v.Pins[1];
+                else EdgePin2 = v.Pins[1];
             }
         }
+    }
+
+    public float GetRelativeVoltageFor(Pin pin){
+        if (EdgePin1 == pin) return pin.Potential - EdgePin2.Potential;
+        else if (EdgePin2 == pin) return pin.Potential - EdgePin1.Potential;
+
+        System.out.println("Pin " + pin.ID + " is not an edge pin of " + ID);
+        return Float.NaN;
     }
 
     @Override

@@ -39,6 +39,9 @@ public class Pin {
         Graphic = new Button(context);
         Graphic.setBackground(AppCompatResources.getDrawable(context,
                 R.drawable.circuit_dot));
+        Graphic.getBackground().setTint(
+                context.getResources().getColor(R.color.mainTheme));
+
         TableRow.LayoutParams params = new TableRow.LayoutParams(
                 64, 64);
         Graphic.setLayoutParams(params);
@@ -46,32 +49,31 @@ public class Pin {
         this.x = x;
         this.y = y;
 
-        Graphic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isSelected){
-                    if (checkCorrectnessFor(selectedPins.size() + 1,
-                            Pin.this)) {
-                        select();
-                        if (selectedPins.size() == maxToSelect) {
-                            Detail d = new Battery(CircuitActivity,
-                                    selectedPins.toArray(new Pin[0]));
-                            CircuitActivity.Details.add(d);
+        Graphic.setOnClickListener(v -> {
+            if (!isSelected){
+                if (checkCorrectnessFor(selectedPins.size() + 1,
+                        Pin.this)) {
+                    select();
+                    if (selectedPins.size() == maxToSelect) {
+                        Detail d = Detail.CreateDetail(
+                                Detail.SelectedDetailType,
+                                CircuitActivity,
+                                selectedPins.toArray(new Pin[0]));
+                        CircuitActivity.Details.add(d);
 
-                            while (selectedPins.size() > 0) {
-                                selectedPins.get(0).deselect();
-                            }
-                        }
-                    }
-                    else {
                         while (selectedPins.size() > 0) {
                             selectedPins.get(0).deselect();
                         }
                     }
                 }
                 else {
-                    deselect();
+                    while (selectedPins.size() > 0) {
+                        selectedPins.get(0).deselect();
+                    }
                 }
+            }
+            else {
+                deselect();
             }
         });
     }

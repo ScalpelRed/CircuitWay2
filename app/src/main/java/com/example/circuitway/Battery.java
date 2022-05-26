@@ -10,6 +10,8 @@ public class Battery extends Wire {
 
         Graphic.setBackground(AppCompatResources.getDrawable(c,
                 R.drawable.d_battery));
+        Graphic.getBackground().setTint(
+                circuitActivity.getResources().getColor(R.color.mainTheme));
     }
 
     @Override
@@ -26,5 +28,22 @@ public class Battery extends Wire {
     public void balancePotentials() {
         Pins[0].balancePotential =  Voltage / 2;
         Pins[1].balancePotential = -Voltage / 2;
+    }
+
+    @Override
+    public String getEditorInfo() {
+        String res = "Battery \nVoltage: " + Voltage;
+        if (!isEditable) res += "\nLocked";
+        return res;
+    }
+
+
+    @Override
+    public float getBranchResistance() {
+        return super.getBranchResistance();
+    }
+    @Override
+    public float getResistance() {
+        return 0;
     }
 }

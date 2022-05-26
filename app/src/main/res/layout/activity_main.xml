@@ -1,17 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/background">
 
     <Button
         android:id="@+id/level0button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+
+        android:background="@drawable/button"
+        android:backgroundTint="@color/mainTheme"
+        android:fontFamily="@font/pgr"
+        android:text="Empty field"
+
+        android:textAlignment="center"
+        android:textColor="@color/mainTheme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/level1button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="Empty field" />
-</RelativeLayout>
+
+        android:background="@drawable/button"
+        android:backgroundTint="@color/mainTheme"
+        android:fontFamily="@font/pgr"
+
+        android:text="Empty field"
+        android:textAlignment="center"
+        android:textColor="@color/mainTheme"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/level0button" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
 

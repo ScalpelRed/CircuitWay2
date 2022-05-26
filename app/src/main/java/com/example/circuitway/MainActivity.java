@@ -19,19 +19,36 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    static boolean levelsInitialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        if (!levelsInitialized) {
+            LevelLoader.CreateLevels();
+            levelsInitialized = true;
+        }
+
         Button level0b = findViewById(R.id.level0button);
+        Button level1b = findViewById(R.id.level1button);
 
         level0b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(MainActivity.this, CircuitActivity.class);
                 i.putExtra("level", 0);
+                startActivity(i);
+            }
+        });
+
+        level1b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, CircuitActivity.class);
+                i.putExtra("level", 1);
                 startActivity(i);
             }
         });
